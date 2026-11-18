@@ -44,7 +44,7 @@ make admin       # creates a dev-only superuser  admin / admin
 ```
 Then open http://127.0.0.1:8000/admin/ → Projections.
 
-## In my own words
+## In my own words - this is a verbatim transcript of me describing my process
 
 I'm quite familiar with retirement calculators online, and before I started I looked
 quickly at a Sanlam retirement calculator. What I don't like about it is that half the
