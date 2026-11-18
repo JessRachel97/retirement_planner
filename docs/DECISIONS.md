@@ -2,17 +2,17 @@
 
 Running record of choices made and why — for review. Newest at top.
 
-## Round 3 — UX redesign + two modes (in progress)
+## Round 3 — UX redesign + two modes (done)
 Triggered by: your look/feel + usability feedback.
 
 | # | Decision | Why | Status |
 |---|----------|-----|--------|
-| 1 | **Two modes via a segmented toggle** — "My current outlook" (savings → pot/income) and "Show me where to start" (target income → how much to save) | Mirrors how real retirement tools work; the reverse-solve answers the question most people actually have ("what should I be saving?"). Reuses the same maths/projection. | building |
-| 2 | **Dusty-pastel palette + softer modern type** (grey-lilac/dusty blue/blush, plum-ink, indigo hero; drop the serif) | Your call: pastel, retro, still professional. The navy+serif read cold/dated; the pastel set feels calmer and more approachable for non-expert users. | building |
-| 3 | **Savings as a few named sources that sum** (pension / cash / investments) + **plain-language tooltips** on every field | One "balance" box didn't match how people actually hold money; summing named sources is clearer without the full tax/liquidity model (that stays the advanced-mode stretch). | building |
-| 4 | **Add optional income → a recommendation** ("replace ~75% of your income") | Lets the tool say something *useful*, not just a number — a target to aim at. Income also makes the "people at your income level" comparison honest (real income, not a contribution proxy). | building |
-| 5 | **Reframe jargon in plain words** — scenario → Cautious/Balanced/Ambitious with blurbs; explain "today's money"; add "why this matters" to the chart | The inputs confused a non-financial user; plain language + a one-line "why" on the chart makes it usable by the public, which is the brief's audience. | building |
-| 6 | **Auto-scroll to results + clearer compare-card copy** | You couldn't tell results were below the fold, and "on track for R9m" read as meaningless; both are comprehension fixes. | building |
+| 1 | **Two modes via a segmented toggle** — "My current outlook" (savings → pot/income) and "Show me where to start" (target income → how much to save) | Mirrors how real retirement tools work; the reverse-solve answers the question most people actually have ("what should I be saving?"). Reuses the same maths/projection. | done |
+| 2 | **Dusty-pastel palette + softer modern type** (grey-lilac/dusty blue/blush, plum-ink, indigo hero; drop the serif) | Your call: pastel, retro, still professional. The navy+serif read cold/dated; the pastel set feels calmer and more approachable for non-expert users. | done |
+| 3 | **Savings as a few named sources that sum** (pension / cash / investments) + **plain-language tooltips** on every field | One "balance" box didn't match how people actually hold money; summing named sources is clearer without the full tax/liquidity model (that stays the advanced-mode stretch). | done |
+| 4 | **Add optional income → a recommendation** ("replace ~75% of your income") | Lets the tool say something *useful*, not just a number — a target to aim at. Income also makes the "people at your income level" comparison honest (real income, not a contribution proxy). | done |
+| 5 | **Reframe jargon in plain words** — scenario → Cautious/Balanced/Ambitious with blurbs; explain "today's money"; add "why this matters" to the chart | The inputs confused a non-financial user; plain language + a one-line "why" on the chart makes it usable by the public, which is the brief's audience. | done |
+| 6 | **Auto-scroll to results + clearer compare-card copy** | You couldn't tell results were below the fold, and "on track for R9m" read as meaningless; both are comprehension fixes. | done |
 
 ## Round 2 — tooling, admin, code quality (done)
 Triggered by: reviewer feedback + your four notes.

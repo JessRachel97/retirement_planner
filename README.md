@@ -44,6 +44,58 @@ make admin       # creates a dev-only superuser  admin / admin
 ```
 Then open http://127.0.0.1:8000/admin/ → Projections.
 
+## In my own words
+
+I'm quite familiar with retirement calculators online, and before I started I looked
+quickly at a Sanlam retirement calculator. What I don't like about it is that half the
+time I don't understand what everything on the form is. To remedy that, I tried to add
+explanation fields and keep the text quite colloquial.
+
+The other thing I don't like is that I don't know what other people are really doing — so
+I added a comparison feature. It currently uses fictitious data, but in a real scenario
+it would save what people enter so it could do anonymised comparisons.
+
+What I do like about the online calculators is that they tell you how much you need to
+save right now if you want to retire by a certain age, rather than just asking what you
+already have. So I added that in as an option.
+
+I elected to keep the views quite simple: I didn't want the form to be overwhelming, so
+I included just a few sections per view and you go next, next, next, rather than one
+giant form.
+
+How the app works: it does two things — a retirement projection and a comparison. The
+projection is year-by-year compound growth. It starts from what you have saved, and every
+year you grow the balance by the expected return (depending on whether they chose an
+aggressive or a conservative strategy). I also used the 4% rule — drawing 4% a year, which
+typically lasts 25 to 30 years. The "where to start" mode does the same thing backwards:
+given what someone wants as their income, it works out the pot they need and then how much
+to contribute every year.
+
+For the comparison, every run on the system is saved to the database anonymously, and each
+time there's a run the median savings and projected pots for people in the same age and
+income band are pulled in — so you can see where you stand against your peers.
+
+That's my basic, human-certified description of the app.
+
+## How it fits together
+Standard Django split: a **project** (config) plus one **app** (the feature).
+
+- **`pension/`** — the project: settings and URL routing. The front door, not logic.
+- **`calculator/`** — the app: all the real code.
+
+A request flows through the app in one line:
+
+```
+request → urls.py → views.index() → forms.PensionForm (validate)
+                                   → projections.project() (the maths)
+                                   → models.Projection (save an anonymous row)
+                                   → trends.compare() (how you compare)
+                                   → templates/index.html (render)
+```
+
+Rule of thumb: a wrong **number** lives in `projections.py`; wrong **data on the page**
+in `views.py`; wrong **look** in `templates/index.html`.
+
 ## What it does
 - A short, **stepped form** collects: age, retirement age, what you've saved (across
   pension/RA, cash, investments and property), yearly income, and either what you save
