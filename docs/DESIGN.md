@@ -2,32 +2,42 @@
 
 A single-page SA retirement planner. No accounts. Built to be read and edited by hand.
 
-## Your decisions (locked)
+This document captures the design as shipped. The chronological reasoning — including
+where the design changed in response to feedback — is in `DECISIONS.md`.
+
+## Shape
 - **Stack:** Django + SQLite, Tailwind + Chart.js via CDN (no build step).
+- **Two modes:** *current outlook* (savings → pot + income) and *where to start*
+  (target income → required saving, via a reverse solver).
 - **Headline:** both the pot *and* a plain-English monthly income — no jargon.
-- **Inputs:** the 5 from the brief + a Low/Expected/High scenario toggle + an
-  adjustable "today's money" (inflation) toggle.
-- **Look:** trustworthy institutional — navy/slate, serif headings, clean cards.
-- **Compare card (compact):** where you stand now vs peers + where your cohort lands.
+- **Inputs:** a short stepped form — age, retirement age, savings across a few named
+  sources (pension/RA, cash, investments, property), yearly income, the mode-specific
+  field, and a plain-language risk choice (Cautious/Balanced/Ambitious).
+- **Results:** a tap-through carousel — headline, growth chart, how-you-compare,
+  year-by-year.
+- **Look:** dusty-pastel, calm and approachable; softer modern type.
 - **Context:** South African — Rand throughout.
 
 ## Assumptions (defensible; in README)
 - Currency Rand; default retirement age 65.
-- Growth presets (nominal): Low 7% / Expected 10% / High 12%.
-- Inflation 5% drives "today's money".
+- Growth scenarios (nominal): Cautious 7% / Balanced 10% / Ambitious 12%.
+- Inflation 5%, applied in the backend to show "today's money" (not a user input).
 - Contributions added end-of-year, flat (no escalation); annual compounding.
 - Monthly income = 4%-of-pot-a-year rule of thumb (lasts ~25–30 yrs), explained plainly.
-- Trends seeded with ~300 synthetic anonymous rows so the compare card is alive on day one.
+- Savings sources summed into one pot with one growth rate; property included as a rough
+  cushion, caveated in the UI.
+- Trends seeded with ~300 synthetic anonymous rows so the compare feature is alive on day one.
 
 ## Build
-- `projections.py` — pure `project(inputs)` → year series + summary. **Unit tested.**
-- `trends.py` — cohort medians + your percentile, by age ±5.
+- `projections.py` — pure maths: `project()` plus `required_contribution()` (the reverse
+  solver) and `pot_needed_for_income()`. **Unit tested.**
+- `trends.py` — cohort medians by age and by income/contribution level.
 - `models.py` — `Projection`: anonymous inputs + computed pot + timestamp.
+- `forms.py` — `PensionForm`: validation and per-mode rules.
 - `views.py` — one view: GET form / POST calc, save, query trends, render.
+- `admin.py` — `Projection` registered for inspection.
 - `seed_trends.py` — synthetic rows.
-- one template, CDN front-end.
-
-Order: math+test → view → template → trends/seed → README. Degrades gracefully if time runs short.
+- one template (+ a tooltip partial), CDN front-end.
 
 ## Advanced mode (optional / stretch)
 Default is **one blended pot, one growth rate** (POC simplification). Advanced mode

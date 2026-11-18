@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Retirement Planner</title>
+  <title>JRC Incorporated — Retirement Planner</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,12 +12,8 @@
     tailwind.config = {
       theme: { extend: {
         colors: {
-          base:  '#F4F2F6',   // grey-lilac background
-          ink:   '#322E3B',   // plum-ink text
-          blue:  '#8E9BC2',   // dusty blue accent
-          mauve: '#C9A2B6',   // blush mauve accent
-          hero:  '#3B3A52',   // deep indigo-grey
-          card:  '#FBFAFC',
+          base:  '#F4F2F6', ink: '#322E3B', blue: '#8E9BC2', mauve: '#C9A2B6',
+          hero:  '#3B3A52', card: '#FBFAFC', sage: '#A7C0A0', gold: '#E0B583', teal: '#7FA8A3',
         },
         fontFamily: {
           sans: ['Inter','system-ui','sans-serif'],
@@ -28,283 +24,320 @@
   </script>
   <style>
     .num { font-variant-numeric: tabular-nums; }
+    @keyframes pulseSoft { 0%,100%{ box-shadow:0 0 10px rgba(201,162,182,.55); } 50%{ box-shadow:0 0 22px rgba(201,162,182,1); } }
+    .animate-pulse-soft { animation: pulseSoft 1.8s ease-in-out infinite; }
   </style>
 </head>
 <body class="bg-base text-ink font-sans antialiased">
 
   <header class="bg-hero text-white">
-    <div class="max-w-5xl mx-auto px-6 py-5 flex items-center justify-between">
-      <div class="font-display text-xl font-semibold tracking-tight">Meridian&nbsp;Retirement</div>
-      <div class="text-xs text-white/60 uppercase tracking-widest">Planning tool · POC</div>
+    <div class="max-w-6xl mx-auto px-6 py-5">
+      <div class="font-display text-xl font-semibold tracking-tight">JRC&nbsp;Incorporated</div>
     </div>
   </header>
 
-  <main class="max-w-5xl mx-auto px-6 py-10">
-    <h1 class="font-display text-3xl md:text-4xl font-semibold mb-2">Do you know about your retirement savings?</h1>
-    <p class="text-ink/60 mb-6 max-w-2xl">Enter a few details and we’ll project your pension pot. In plain terms, what you could draw each month in your retirement.</p>
+  <main class="max-w-6xl mx-auto px-6 py-10">
+    <h1 class="font-display text-3xl md:text-4xl font-semibold mb-2">What do you know about your retirement savings?</h1>
+    <p id="intro" class="text-ink/60 mb-6 max-w-2xl">Answer a few quick questions and we’ll project your pension pot — and what it could pay you each month.</p>
 
     <!-- MODE TABS -->
-    <div class="inline-flex rounded-xl bg-white p-1 ring-1 ring-black/5 mb-6" role="tablist">
+    <div class="inline-flex rounded-2xl bg-white p-1.5 ring-1 ring-black/5 shadow-sm gap-1 mb-6" role="tablist">
       <button type="button" id="tab-outlook" onclick="setMode('outlook')"
-        class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">My current outlook</button>
+        class="px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors">My current outlook</button>
       <button type="button" id="tab-start" onclick="setMode('start')"
-        class="px-4 py-2 text-sm font-medium rounded-lg transition-colors">Show me where to start</button>
+        class="px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors">Show me where to start</button>
     </div>
 
-    <div class="grid md:grid-cols-5 gap-8">
-      <!-- FORM -->
-      <form method="post" id="calc-form" class="md:col-span-2 bg-card rounded-2xl shadow-sm ring-1 ring-black/5 p-6 space-y-4 h-fit">
+    <div class="grid md:grid-cols-5 gap-8 items-start">
+      <!-- WIZARD (left) -->
+      <form method="post" id="calc-form" class="md:col-span-2 bg-card rounded-2xl shadow-sm ring-1 ring-black/5 p-6">
         {% csrf_token %}
         <input type="hidden" name="mode" id="mode-input" value="{{ form.mode }}">
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium mb-1">Your age</label>
-            <input name="current_age" type="number" min="18" max="80" value="{{ form.current_age }}" required
-                   class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue focus:border-blue outline-none">
-          </div>
-          <div>
-            <label class="text-sm font-medium mb-1 flex items-center">Retire at
-              {% include "tip.html" with text="The age you'd like to stop working and start drawing an income. In SA, often 60–65." %}
-            </label>
-            <input name="retirement_age" type="number" min="40" max="90" value="{{ form.retirement_age }}" required
-                   class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue focus:border-blue outline-none">
-          </div>
+        <div class="flex items-center justify-center gap-2 mb-5">
+          <span class="dot h-2 w-2 rounded-full bg-hero" data-dot="1"></span>
+          <span class="dot h-2 w-2 rounded-full bg-black/15" data-dot="2"></span>
+          <span class="dot h-2 w-2 rounded-full bg-black/15" data-dot="3"></span>
         </div>
 
-        <!-- Savings sources -->
-        <div>
-          <div class="text-sm font-medium mb-1 flex items-center">What have you saved so far?
-            {% include "tip.html" with text="Add up roughly what's in each place. We total them — it doesn't need to be exact." %}
+        <!-- STEP 1 -->
+        <div data-step="1" class="space-y-4">
+          <div class="text-sm font-semibold text-ink/70">Step 1 · About you</div>
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium mb-1">Your age</label>
+              <input name="current_age" type="number" min="18" max="80" value="{{ form.current_age }}" required
+                     class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
+            </div>
+            <div>
+              <label class="text-sm font-medium mb-1 flex items-center">Retire at
+                {% include "tip.html" with text="The age you'd like to stop working and start drawing an income. In SA, often 60–65." %}
+              </label>
+              <input name="retirement_age" type="number" min="40" max="90" value="{{ form.retirement_age }}" required
+                     class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
+            </div>
           </div>
+          <button type="button" onclick="go(2)" class="w-full bg-hero text-white font-semibold rounded-lg py-2.5 hover:bg-ink transition-colors">Next</button>
+        </div>
+
+        <!-- STEP 2 -->
+        <div data-step="2" class="space-y-4 hidden">
+          <div class="text-sm font-semibold text-ink/70">Step 2 · What you have today</div>
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <span class="w-32 text-xs text-ink/60">Pension / RA</span>
+              <span class="w-36 text-xs text-ink/60 flex items-center">Pension / RA
+                {% include "tip.html" with text="Retirement annuities and workplace pension/provident funds." %}</span>
               <input name="savings_pension" type="number" min="0" step="1000" value="{{ form.savings_pension }}"
                      class="flex-1 num rounded-lg border border-black/10 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue outline-none">
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-32 text-xs text-ink/60">Savings / cash</span>
+              <span class="w-36 text-xs text-ink/60">Savings / cash</span>
               <input name="savings_cash" type="number" min="0" step="1000" value="{{ form.savings_cash }}"
                      class="flex-1 num rounded-lg border border-black/10 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue outline-none">
             </div>
             <div class="flex items-center gap-2">
-              <span class="w-32 text-xs text-ink/60">Investments / TFSA</span>
+              <span class="w-36 text-xs text-ink/60">Investments / TFSA</span>
               <input name="savings_investments" type="number" min="0" step="1000" value="{{ form.savings_investments }}"
                      class="flex-1 num rounded-lg border border-black/10 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue outline-none">
             </div>
+            <div class="flex items-center gap-2">
+              <span class="w-36 text-xs text-ink/60 flex items-center">Property
+                {% include "tip.html" with text="Roughly your home equity (value minus bond). Note: a home isn't easily turned into monthly income, so treat this as a rough cushion." %}</span>
+              <input name="savings_property" type="number" min="0" step="1000" value="{{ form.savings_property }}"
+                     class="flex-1 num rounded-lg border border-black/10 px-3 py-1.5 text-sm focus:ring-2 focus:ring-blue outline-none">
+            </div>
           </div>
-        </div>
-
-        <div>
-          <label class="text-sm font-medium mb-1 flex items-center">Your yearly income
-            {% include "tip.html" with text="Roughly what you earn before tax per year. Optional — we use it to suggest a sensible target to aim for." %}
-          </label>
-          <input name="income" type="number" min="0" step="1000" value="{{ form.income }}"
-                 class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
-        </div>
-
-        <!-- OUTLOOK-only field -->
-        <div data-mode="outlook">
-          <label class="text-sm font-medium mb-1 flex items-center">You save each year
-            {% include "tip.html" with text="Everything you put towards retirement in a year — your contributions plus any employer adds. A rule of thumb is around 15% of income." %}
-          </label>
-          <input name="annual_contribution" type="number" min="0" step="1000" value="{{ form.annual_contribution }}"
-                 class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
-        </div>
-
-        <!-- START-only field -->
-        <div data-mode="start" class="hidden">
-          <label class="text-sm font-medium mb-1 flex items-center">Monthly income you want
-            {% include "tip.html" with text="How much you'd like to have to live on each month in retirement, in today's money. We'll work out what to save for it." %}
-          </label>
-          <input name="target_monthly_income" type="number" min="0" step="500" value="{{ form.target_monthly_income }}"
-                 class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
-        </div>
-
-        <!-- Risk / growth, in plain words -->
-        <div>
-          <div class="text-sm font-medium mb-1 flex items-center">How are your savings invested?
-            {% include "tip.html" with text="Riskier investments can grow more over time but swing up and down more. Most retirement funds are 'balanced'." %}
-          </div>
-          <div class="grid grid-cols-3 gap-2">
-            {% for s in scenarios %}
-            <label class="cursor-pointer">
-              <input type="radio" name="scenario" value="{{ s.key }}" class="peer sr-only" {% if form.scenario == s.key %}checked{% endif %}>
-              <div class="text-center rounded-lg border border-black/10 py-2 px-1 text-sm peer-checked:bg-hero peer-checked:text-white peer-checked:border-hero">
-                {{ s.label }}<div class="text-[11px] opacity-70">~{{ s.pct }}% a year</div>
-              </div>
+          <div>
+            <label class="text-sm font-medium mb-1 flex items-center">Your yearly income
+              {% include "tip.html" with text="Roughly what you earn before tax per year. We use it to suggest a sensible target to aim for." %}
             </label>
-            {% endfor %}
+            <input name="income" type="number" min="0" step="1000" value="{{ form.income }}"
+                   class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
+          </div>
+          <div class="flex gap-2">
+            <button type="button" onclick="go(1)" class="flex-1 border border-black/10 rounded-lg py-2.5 font-medium hover:bg-black/[0.03]">Back</button>
+            <button type="button" onclick="go(3)" class="flex-1 bg-hero text-white font-semibold rounded-lg py-2.5 hover:bg-ink transition-colors">Next</button>
           </div>
         </div>
 
-        <div class="pt-2 border-t border-black/5">
-          <label class="flex items-center gap-2 text-sm">
-            <!-- Unchecked checkbox sends nothing; BooleanField(required=False) handles it. -->
-            <input type="checkbox" name="show_today" {% if form.show_today %}checked{% endif %} class="rounded border-black/20 text-blue focus:ring-blue">
-            Show amounts in today’s money
-            {% include "tip.html" with text="Future Rand buy less because prices rise. 'Today's money' shows what a future amount would feel like to spend now." %}
-          </label>
-          <div class="mt-2 flex items-center gap-2 text-sm text-ink/60">
-            <span>Prices rise about</span>
-            <input name="inflation_pct" type="number" min="0" max="15" step="0.5" value="{{ form.inflation_pct|floatformat:1 }}"
-                   class="w-16 num rounded-lg border border-black/10 px-2 py-1">
-            <span>% a year</span>
+        <!-- STEP 3 -->
+        <div data-step="3" class="space-y-4 hidden">
+          <div class="text-sm font-semibold text-ink/70">Step 3 · <span data-mode="outlook">What you save</span><span data-mode="start" class="hidden">Your goal</span></div>
+
+          <div data-mode="outlook">
+            <label class="text-sm font-medium mb-1 flex items-center">You save each year
+              {% include "tip.html" with text="Everything you put towards retirement in a year — yours plus any employer top-up. A rule of thumb is around 15% of income." %}
+            </label>
+            <input name="annual_contribution" type="number" min="0" step="1000" value="{{ form.annual_contribution }}"
+                   class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
+          </div>
+          <div data-mode="start" class="hidden">
+            <label class="text-sm font-medium mb-1 flex items-center">Monthly income you want
+              {% include "tip.html" with text="How much you'd like to live on each month in retirement, in today's money. We'll work out what to save for it." %}
+            </label>
+            <input name="target_monthly_income" type="number" min="0" step="500" value="{{ form.target_monthly_income }}"
+                   class="w-full num rounded-lg border border-black/10 px-3 py-2 focus:ring-2 focus:ring-blue outline-none">
+          </div>
+
+          <div>
+            <div class="text-sm font-medium mb-1 flex items-center">How are your savings invested?
+              {% include "tip.html" with text="Riskier investments can grow more over time but swing up and down more. Most retirement funds are 'balanced'." %}
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              {% for s in scenarios %}
+              <label class="cursor-pointer">
+                <input type="radio" name="scenario" value="{{ s.key }}" class="peer sr-only" {% if form.scenario == s.key %}checked{% endif %}>
+                <div class="text-center rounded-lg border border-black/10 py-2 px-1 text-sm peer-checked:bg-hero peer-checked:text-white peer-checked:border-hero">
+                  {{ s.label }}<div class="text-[11px] opacity-70">~{{ s.pct }}% a year</div>
+                </div>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="flex gap-2">
+            <button type="button" onclick="go(2)" class="flex-1 border border-black/10 rounded-lg py-2.5 font-medium hover:bg-black/[0.03]">Back</button>
+            <button type="submit" class="flex-1 bg-mauve text-ink font-semibold rounded-lg py-2.5 hover:bg-hero hover:text-white transition-colors">
+              <span data-mode="outlook">See my outlook</span><span data-mode="start" class="hidden">Show me where to start</span>
+            </button>
           </div>
         </div>
-
-        <button class="w-full bg-mauve hover:bg-hero hover:text-white text-ink font-semibold rounded-lg py-3 transition-colors">
-          <span data-mode="outlook">See my outlook</span>
-          <span data-mode="start" class="hidden">Show me where to start</span>
-        </button>
       </form>
 
-      <!-- RESULTS -->
-      <div class="md:col-span-3 space-y-5" id="results">
+      <!-- RESULTS (right) -->
+      <div class="md:col-span-3">
         {% if error %}
-          <div class="bg-mauve/20 text-ink ring-1 ring-mauve/40 rounded-xl p-4 text-sm">{{ error }}</div>
+          <div class="bg-gold/20 text-ink ring-1 ring-gold/50 rounded-xl p-4 text-sm">{{ error }}</div>
         {% endif %}
 
         {% if not result and not error %}
-          <div class="bg-card rounded-2xl ring-1 ring-black/5 p-10 text-center text-ink/50">
-            <p class="font-display text-xl text-ink mb-1">Your results will appear here</p>
-            <p class="text-sm">Fill in the form and press the button.</p>
+          <div class="bg-card rounded-2xl ring-1 ring-black/5 p-10 text-center text-ink/50 h-full flex flex-col justify-center min-h-[420px]">
+            <p class="font-display text-lg text-ink mb-1">Your results will appear here</p>
+            <p class="text-sm">Finish the steps on the left and press the button.</p>
           </div>
         {% endif %}
 
         {% if result %}
         {% with p=result.p %}
-          <!-- HERO -->
-          <div class="bg-hero text-white rounded-2xl p-8 shadow-sm">
-          {% if result.mode == "start" %}
-            {% if result.required_monthly > 0 %}
-              <div class="text-sm uppercase tracking-widest text-white/60 mb-1">What to save</div>
-              <div class="font-display text-5xl font-semibold num">R{{ result.required_monthly|floatformat:0|intcomma }}<span class="text-xl font-normal text-white/70"> / month</span></div>
-              <p class="text-white/70 mt-2">to retire on about R{{ form.target_monthly_income|floatformat:0|intcomma }} a month (today’s money) at {{ form.retirement_age }}.</p>
-            {% else %}
-              <div class="font-display text-3xl font-semibold">You’re already on track 🎉</div>
-              <p class="text-white/70 mt-2">Your current savings alone should grow past your goal of R{{ form.target_monthly_income|floatformat:0|intcomma }} a month. You may not need to save more.</p>
-            {% endif %}
-            <div class="mt-5 pt-5 border-t border-white/15 text-sm text-white/70">
-              <span class="uppercase tracking-widest text-white/50">Projected pot at {{ form.retirement_age }}</span><br>
-              <span class="num text-lg text-white">R{{ p.pot|floatformat:0|intcomma }}</span>
-              {% if form.show_today %}<span class="text-white/60"> · ≈ R{{ p.pot_today|floatformat:0|intcomma }} today</span>{% endif %}
+        <div class="bg-card rounded-2xl ring-1 ring-black/5 p-6 min-h-[420px] flex flex-col">
+          <!-- carousel header -->
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex gap-1.5" id="rslide-dots"></div>
+            <div class="flex gap-2.5">
+              <button type="button" onclick="rslide(-1)"
+                class="h-10 w-10 rounded-full bg-white text-hero ring-1 ring-mauve/50 shadow-[0_0_12px_rgba(201,162,182,0.55)] hover:bg-mauve hover:text-white hover:scale-110 hover:shadow-[0_0_18px_rgba(201,162,182,0.9)] transition-all flex items-center justify-center text-lg leading-none">‹</button>
+              <button type="button" onclick="rslide(1)"
+                class="h-10 w-10 rounded-full bg-mauve text-white shadow-[0_0_14px_rgba(201,162,182,0.75)] hover:bg-hero hover:scale-110 hover:shadow-[0_0_22px_rgba(201,162,182,1)] transition-all flex items-center justify-center text-lg leading-none animate-pulse-soft">›</button>
             </div>
-          {% else %}
-            <div class="text-sm uppercase tracking-widest text-white/60 mb-1">Projected pot at {{ form.retirement_age }}</div>
-            <div class="font-display text-5xl font-semibold num">R{{ p.pot|floatformat:0|intcomma }}</div>
-            {% if form.show_today %}
-              <div class="text-white/70 mt-1 num">≈ R{{ p.pot_today|floatformat:0|intcomma }} in today’s money</div>
-            {% endif %}
-            <div class="mt-5 pt-5 border-t border-white/15">
-              <div class="text-sm text-white/70">That could pay you about</div>
-              <div class="text-2xl font-semibold num">R{{ p.monthly_income|floatformat:0|intcomma }}<span class="text-base font-normal text-white/70"> / month</span></div>
-              <p class="text-xs text-white/60 mt-1">A common rule of thumb — drawing 4% of your pot a year — which typically keeps a pot going for 25–30 years. Want it to last longer or draw more? That’s a conversation for a financial adviser.</p>
-            </div>
-          {% endif %}
           </div>
 
-          <!-- RECOMMENDATION (needs income) -->
-          {% if result.recommendation %}
-          {% with rec=result.recommendation %}
-          <div class="rounded-2xl p-5 ring-1 {% if rec.on_track %}bg-blue/15 ring-blue/40{% else %}bg-mauve/15 ring-mauve/40{% endif %}">
-            <div class="text-sm font-semibold mb-1">
-              {% if rec.on_track %}You’re on track 👍{% else %}A gentle nudge{% endif %}
-            </div>
-            <p class="text-sm text-ink/70">
-              You’re projected to replace about <strong class="num">{{ rec.ratio_pct|floatformat:0 }}%</strong> of today’s income in retirement.
-              {% if rec.on_track %}
-                That’s at or above the ~75% many people aim for.
+          <div class="flex-1">
+            <!-- SLIDE 1 · headline -->
+            <section data-rslide="1">
+              <div class="bg-hero text-white rounded-2xl p-7">
+              {% if result.mode == "start" %}
+                {% if result.required_monthly > 0 %}
+                  <div class="text-sm uppercase tracking-widest text-gold mb-1">What to save</div>
+                  <div class="font-display text-5xl font-semibold num">R{{ result.required_monthly|floatformat:0|intcomma }}<span class="text-xl font-normal text-white/70"> / month</span></div>
+                  <p class="text-white/70 mt-2">to retire on about R{{ form.target_monthly_income|floatformat:0|intcomma }} a month (today’s money) at {{ form.retirement_age }}.</p>
+                {% else %}
+                  <div class="font-display text-3xl font-semibold">You’re already on track</div>
+                  <p class="text-white/70 mt-2">Your current savings alone should grow past your goal of R{{ form.target_monthly_income|floatformat:0|intcomma }} a month.</p>
+                {% endif %}
+                <div class="mt-5 pt-5 border-t border-white/15 text-sm text-white/70">
+                  <span class="uppercase tracking-widest text-white/50">Projected pot at {{ form.retirement_age }}</span><br>
+                  <span class="num text-lg text-white">R{{ p.pot|floatformat:0|intcomma }}</span>
+                  <span class="text-white/60"> · ≈ R{{ p.pot_today|floatformat:0|intcomma }} in today’s money</span>
+                </div>
               {% else %}
-                Many people aim for ~75% (about R{{ rec.target_monthly|floatformat:0|intcomma }}/month). Saving a bit more, or retiring slightly later, closes the gap.
+                <div class="text-sm uppercase tracking-widest text-gold mb-1">Projected pot at {{ form.retirement_age }}</div>
+                <div class="font-display text-5xl font-semibold num">R{{ p.pot|floatformat:0|intcomma }}</div>
+                <div class="text-white/70 mt-1 num">≈ R{{ p.pot_today|floatformat:0|intcomma }} in today’s money</div>
+                <div class="mt-5 pt-5 border-t border-white/15">
+                  <div class="text-sm text-white/70">That could pay you about</div>
+                  <div class="text-2xl font-semibold num">R{{ p.monthly_income|floatformat:0|intcomma }}<span class="text-base font-normal text-white/70"> / month</span></div>
+                  <p class="text-xs text-white/60 mt-1">A common rule of thumb — drawing 4% of your pot a year — which typically keeps a pot going for 25–30 years. Want it to last longer? That’s a conversation for a financial adviser.</p>
+                </div>
               {% endif %}
-            </p>
+              </div>
+            </section>
+
+            <!-- SLIDE 2 · chart -->
+            <section data-rslide="2" class="hidden">
+              <div class="text-sm font-medium mb-1">Where your pot comes from</div>
+              <p class="text-xs text-ink/50 mb-3">The gap between the two lines is growth — your money earning money. Given time, it does more of the work than your contributions.</p>
+              <canvas id="growth" height="170"></canvas>
+              {{ result.chart_labels|json_script:"chartLabels" }}
+              {{ result.chart_pot|json_script:"chartPot" }}
+              {{ result.chart_contributed|json_script:"chartContributed" }}
+            </section>
+
+            <!-- SLIDE 3 · how you compare -->
+            <section data-rslide="3" class="hidden space-y-4">
+              {% if result.recommendation %}
+              {% with rec=result.recommendation %}
+              <div class="rounded-2xl p-5 ring-1 {% if rec.on_track %}bg-sage/20 ring-sage/50{% else %}bg-gold/20 ring-gold/50{% endif %}">
+                <div class="text-sm font-semibold mb-1">{% if rec.on_track %}You’re on track{% else %}A gentle nudge{% endif %}</div>
+                <p class="text-sm text-ink/70">
+                  You’re projected to replace about <strong class="num">{{ rec.ratio_pct|floatformat:0 }}%</strong> of today’s income in retirement.
+                  {% if rec.on_track %}That’s at or above the ~75% many people aim for.
+                  {% else %}Many aim for ~75% (about R{{ rec.target_monthly|floatformat:0|intcomma }}/month). Saving a bit more, or retiring slightly later, closes the gap.{% endif %}
+                </p>
+              </div>
+              {% endwith %}
+              {% endif %}
+              <div class="grid sm:grid-cols-2 gap-4">
+                {% if result.comparison.by_age %}
+                <div class="bg-base rounded-2xl ring-1 ring-black/5 p-5 border-l-4 border-blue">
+                  <div class="text-xs uppercase tracking-widest text-ink/50 mb-1">People around your age</div>
+                  <p class="text-sm text-ink/70">have saved about</p>
+                  <div class="font-display text-2xl num">R{{ result.comparison.by_age.median_balance|floatformat:0|intcomma }}</div>
+                  <p class="mt-1 text-sm {% if result.comparison.by_age.ahead %}text-teal{% else %}text-mauve{% endif %}">
+                    You’ve saved R{{ result.balance|floatformat:0|intcomma }} — {% if result.comparison.by_age.ahead %}ahead of{% else %}behind{% endif %} the middle of the pack.
+                  </p>
+                </div>
+                {% endif %}
+                {% if result.comparison.by_income %}
+                <div class="bg-base rounded-2xl ring-1 ring-black/5 p-5 border-l-4 border-gold">
+                  <div class="text-xs uppercase tracking-widest text-ink/50 mb-1">People {% if form.income %}earning{% else %}saving{% endif %} like you</div>
+                  <p class="text-sm text-ink/70">typically retire with about</p>
+                  <div class="font-display text-2xl num">R{{ result.comparison.by_income.median_pot|floatformat:0|intcomma }}</div>
+                  <p class="mt-1 text-xs text-ink/50">Based on similar people in our data.</p>
+                </div>
+                {% endif %}
+              </div>
+            </section>
+
+            <!-- SLIDE 4 · year-by-year -->
+            <section data-rslide="4" class="hidden">
+              <div class="text-sm font-medium mb-2">Year-by-year breakdown</div>
+              <div class="overflow-y-auto max-h-[340px]">
+                <table class="w-full text-sm num">
+                  <thead class="text-ink/50 text-left border-b border-black/10 sticky top-0 bg-card">
+                    <tr><th class="py-2 font-medium">Age</th><th class="text-right font-medium">Opening</th><th class="text-right font-medium">You add</th><th class="text-right font-medium">Growth</th><th class="text-right font-medium">Closing</th></tr>
+                  </thead>
+                  <tbody>
+                    {% for r in p.rows %}
+                    <tr class="border-b border-black/5 {% cycle '' 'bg-black/[0.015]' %}">
+                      <td class="py-1.5">{{ r.age }}</td>
+                      <td class="text-right">R{{ r.opening|floatformat:0|intcomma }}</td>
+                      <td class="text-right text-ink/60">R{{ r.contribution|floatformat:0|intcomma }}</td>
+                      <td class="text-right text-teal">+R{{ r.growth|floatformat:0|intcomma }}</td>
+                      <td class="text-right font-medium">R{{ r.closing|floatformat:0|intcomma }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </section>
           </div>
-          {% endwith %}
-          {% endif %}
 
-          <!-- CHART -->
-          <div class="bg-card rounded-2xl ring-1 ring-black/5 p-6">
-            <div class="text-sm font-medium mb-1">Where your pot comes from</div>
-            <p class="text-xs text-ink/50 mb-3">The gap between the two lines is growth — your money earning money. Given time, it does more of the work than your contributions.</p>
-            <canvas id="growth" height="130"></canvas>
-            <!-- Data shaped in views.py: chart_labels (ages), chart_pot, chart_contributed. -->
-            {{ result.chart_labels|json_script:"chartLabels" }}
-            {{ result.chart_pot|json_script:"chartPot" }}
-            {{ result.chart_contributed|json_script:"chartContributed" }}
-          </div>
+          <div class="text-center text-xs text-ink/40 mt-4" id="rslide-label"></div>
+        </div>
 
-          <!-- COMPARE -->
-          {% if result.comparison.by_age or result.comparison.by_income %}
-          <div class="grid sm:grid-cols-2 gap-4">
-            {% if result.comparison.by_age %}
-            <div class="bg-card rounded-2xl ring-1 ring-black/5 p-5">
-              <div class="text-xs uppercase tracking-widest text-ink/50 mb-1">People around your age</div>
-              <p class="text-sm text-ink/70">have saved about</p>
-              <div class="font-display text-2xl num">R{{ result.comparison.by_age.median_balance|floatformat:0|intcomma }}</div>
-              <p class="mt-2 text-sm {% if result.comparison.by_age.ahead %}text-blue{% else %}text-mauve{% endif %}">
-                You’ve saved R{{ result.balance|floatformat:0|intcomma }} — {% if result.comparison.by_age.ahead %}ahead of{% else %}behind{% endif %} the middle of the pack.
-              </p>
-            </div>
-            {% endif %}
-            {% if result.comparison.by_income %}
-            <div class="bg-card rounded-2xl ring-1 ring-black/5 p-5">
-              <div class="text-xs uppercase tracking-widest text-ink/50 mb-1">People {% if form.income %}earning{% else %}saving{% endif %} like you</div>
-              <p class="text-sm text-ink/70">typically retire with about</p>
-              <div class="font-display text-2xl num">R{{ result.comparison.by_income.median_pot|floatformat:0|intcomma }}</div>
-              <p class="mt-2 text-xs text-ink/50">Based on similar people in our data.</p>
-            </div>
-            {% endif %}
-          </div>
-          {% endif %}
+        <script>
+          const labels = JSON.parse(document.getElementById('chartLabels').textContent);
+          const pot = JSON.parse(document.getElementById('chartPot').textContent);
+          const contributed = JSON.parse(document.getElementById('chartContributed').textContent);
+          const cv = document.getElementById('growth');
+          const g = cv.getContext('2d').createLinearGradient(0, 0, 0, 300);
+          g.addColorStop(0, 'rgba(142,155,194,0.45)'); g.addColorStop(1, 'rgba(142,155,194,0.03)');
+          new Chart(cv, {
+            type: 'line',
+            data: { labels, datasets: [
+              { label: 'Your pot', data: pot, borderColor: '#5E5E96', backgroundColor: g, fill: true, tension: 0.35, pointRadius: 0, borderWidth: 3 },
+              { label: 'What you put in', data: contributed, borderColor: '#C9A2B6', fill: false, tension: 0.35, pointRadius: 0, borderWidth: 2, borderDash: [5,4] },
+            ]},
+            options: { plugins: { legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } } },
+              scales: { x: { title: { display: true, text: 'Age' }, grid: { display: false } },
+                        y: { ticks: { callback: v => 'R' + (v/1000000).toFixed(1) + 'm' }, grid: { color: 'rgba(0,0,0,0.05)' } } } }
+          });
 
-          <!-- TABLE -->
-          <details class="bg-card rounded-2xl ring-1 ring-black/5 p-6">
-            <summary class="cursor-pointer text-sm font-medium select-none">See the year-by-year breakdown</summary>
-            <div class="mt-4 overflow-x-auto">
-              <table class="w-full text-sm num">
-                <thead class="text-ink/50 text-left border-b border-black/10">
-                  <tr><th class="py-2 font-medium">Age</th><th class="text-right font-medium">Opening</th><th class="text-right font-medium">You add</th><th class="text-right font-medium">Growth</th><th class="text-right font-medium">Closing</th></tr>
-                </thead>
-                <tbody>
-                  {% for r in p.rows %}
-                  <tr class="border-b border-black/5 {% cycle '' 'bg-black/[0.015]' %}">
-                    <td class="py-1.5">{{ r.age }}</td>
-                    <td class="text-right">R{{ r.opening|floatformat:0|intcomma }}</td>
-                    <td class="text-right text-ink/60">R{{ r.contribution|floatformat:0|intcomma }}</td>
-                    <td class="text-right text-blue">+R{{ r.growth|floatformat:0|intcomma }}</td>
-                    <td class="text-right font-medium">R{{ r.closing|floatformat:0|intcomma }}</td>
-                  </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          </details>
-
-          <script>
-            const labels = JSON.parse(document.getElementById('chartLabels').textContent);
-            const pot = JSON.parse(document.getElementById('chartPot').textContent);
-            const contributed = JSON.parse(document.getElementById('chartContributed').textContent);
-            new Chart(document.getElementById('growth'), {
-              type: 'line',
-              data: { labels, datasets: [
-                { label: 'Your pot', data: pot, borderColor: '#8E9BC2',
-                  backgroundColor: 'rgba(142,155,194,0.18)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2 },
-                { label: 'What you put in', data: contributed, borderColor: '#C9A2B6',
-                  backgroundColor: 'rgba(201,162,182,0.12)', fill: true, tension: 0.3, pointRadius: 0, borderWidth: 2, borderDash: [5,4] },
-              ]},
-              options: {
-                plugins: { legend: { display: true, labels: { boxWidth: 12, font: { size: 11 } } } },
-                scales: {
-                  x: { title: { display: true, text: 'Age' }, grid: { display: false } },
-                  y: { ticks: { callback: v => 'R' + (v/1000000).toFixed(1) + 'm' }, grid: { color: 'rgba(0,0,0,0.05)' } }
-                }
-              }
-            });
-            // Bring results into view after a calculation.
-            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
-          </script>
+          // --- results carousel (tap-through, no scroll) ---
+          const RLABELS = { 1: 'Your headline number', 2: 'Where it comes from', 3: 'How you compare', 4: 'Year by year' };
+          const rslides = document.querySelectorAll('[data-rslide]');
+          let rcur = 1;
+          const dotsBox = document.getElementById('rslide-dots');
+          rslides.forEach((_, i) => {
+            const d = document.createElement('button');
+            d.type = 'button'; d.onclick = () => rgo(i + 1);
+            d.className = 'h-2 w-2 rounded-full transition-colors';
+            d.dataset.rdot = i + 1; dotsBox.appendChild(d);
+          });
+          function rgo(n) {
+            rcur = Math.min(rslides.length, Math.max(1, n));
+            rslides.forEach(s => s.classList.toggle('hidden', +s.dataset.rslide !== rcur));
+            document.querySelectorAll('[data-rdot]').forEach(d =>
+              d.className = 'h-2 w-2 rounded-full transition-colors ' + (+d.dataset.rdot === rcur ? 'bg-hero' : 'bg-black/15'));
+            document.getElementById('rslide-label').textContent = rcur + ' / ' + rslides.length + ' · ' + RLABELS[rcur];
+          }
+          function rslide(dir) {
+            // Stop the attention-pulse once they've started tapping through.
+            document.querySelectorAll('.animate-pulse-soft').forEach(b => b.classList.remove('animate-pulse-soft'));
+            rgo(rcur + dir);
+          }
+          rgo(1);
+        </script>
         {% endwith %}
         {% endif %}
       </div>
@@ -314,18 +347,28 @@
   </main>
 
   <script>
-    // Toggle between the two modes: set the hidden input, swap which fields and
-    // labels show, and highlight the active tab.
+    // --- Stepped form navigation ---
+    let step = 1;
+    function go(n) {
+      step = n;
+      document.querySelectorAll('[data-step]').forEach(el => el.classList.toggle('hidden', +el.dataset.step !== n));
+      document.querySelectorAll('[data-dot]').forEach(d => {
+        d.classList.toggle('bg-hero', +d.dataset.dot <= n);
+        d.classList.toggle('bg-black/15', +d.dataset.dot > n);
+      });
+    }
+    // --- Mode toggle ---
+    const INTRO = {
+      outlook: "You know roughly what you’ve got — let’s project it forward and see what it becomes.",
+      start:   "Not sure where to begin? Tell us the monthly income you’d like, and we’ll work out what to save.",
+    };
     function setMode(mode) {
       document.getElementById('mode-input').value = mode;
-      document.querySelectorAll('[data-mode]').forEach(el => {
-        el.classList.toggle('hidden', el.dataset.mode !== mode);
-      });
+      document.querySelectorAll('[data-mode]').forEach(el => el.classList.toggle('hidden', el.dataset.mode !== mode));
+      document.getElementById('intro').textContent = INTRO[mode];
       const active = 'bg-hero text-white';
-      document.getElementById('tab-outlook').className =
-        'px-4 py-2 text-sm font-medium rounded-lg transition-colors ' + (mode === 'outlook' ? active : 'text-ink/60');
-      document.getElementById('tab-start').className =
-        'px-4 py-2 text-sm font-medium rounded-lg transition-colors ' + (mode === 'start' ? active : 'text-ink/60');
+      document.getElementById('tab-outlook').className = 'px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors ' + (mode === 'outlook' ? active : 'text-ink/60 hover:text-ink');
+      document.getElementById('tab-start').className = 'px-5 py-2.5 text-sm font-semibold rounded-xl transition-colors ' + (mode === 'start' ? active : 'text-ink/60 hover:text-ink');
     }
     setMode(document.getElementById('mode-input').value || 'outlook');
   </script>
