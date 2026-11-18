@@ -1,0 +1,5 @@
+{# Small hover/focus tooltip. Usage: {% include "tip.html" with text="..." %} #}
+<span class="group relative ml-1 inline-flex align-middle">
+  <span tabindex="0" class="h-4 w-4 flex items-center justify-center rounded-full bg-black/10 text-ink/60 text-[10px] font-bold cursor-help select-none">?</span>
+  <span class="pointer-events-none absolute left-1/2 bottom-full z-20 mb-2 hidden w-56 -translate-x-1/2 rounded-lg bg-ink text-white text-xs font-normal leading-snug p-2 shadow-lg group-hover:block group-focus-within:block">{{ text }}</span>
+</span>
